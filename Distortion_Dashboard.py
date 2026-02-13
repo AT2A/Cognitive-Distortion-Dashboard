@@ -523,12 +523,24 @@ def main() -> None:
 
     instances_by_dist: Dict[str, pd.DataFrame] = st.session_state.instances_by_dist or {}
 
-    tab_heatmap, tab_radar = st.tabs(["Heatmap", "Radar"])
+
+
+    view = st.segmented_control(
+        label="View",
+        options=["Heatmap", "Radar"],
+        default="Heatmap",
+        key="view_mode",
+        label_visibility="collapsed",
+        width="stretch",
+    )
+
+    st.divider()
+
 
     # =============================
     # Heatmap tab + Inspector
     # =============================
-    with tab_heatmap:
+    if view == "Heatmap":
         st.subheader("Heatmap")
         
         if PLOTLY_EVENTS_AVAILABLE:
@@ -662,7 +674,7 @@ def main() -> None:
     # =============================
     # Radar tab
     # =============================
-    with tab_radar:
+    elif view == "Radar":
         st.subheader("Radar")   
 
         radar_fig = make_radar_mpl(df_wide, dist_cols)
@@ -703,7 +715,25 @@ def main() -> None:
                 hide_index=True,
             )
         
-        # Raw data table at bottom of radar tab
+        
+            # Optional: highlighted sentences (kept off by default for performance)
+            with st.expander("Show highlighted sentences", expanded=False):
+                render_hl = st.toggle(
+                    "Render highlighted sentences (can be slow)",
+                    value=False,
+                    key="radar_render_hl",
+                )
+                if render_hl:
+                    max_hl = st.slider("How many sentences", 5, 60, 20, 5, key="radar_hl_n")
+                    for _, r in inst.head(int(max_hl)).iterrows():
+                        ht = str(int(r["human_turn"]))
+                        feats = matches.get(ht, {}).get(current_radar_dist, [])
+                        sent = str(r["sentence"])
+                        st.markdown(_highlight_features(sent, feats), unsafe_allow_html=True)
+                        if feats:
+                            st.caption("Matched features: " + ", ".join(feats))
+                        st.markdown("---")
+# Raw data table at bottom of radar tab
         st.markdown("---")
         st.subheader("Raw Feature Hit Data")
         st.caption("Complete feature extraction results for all user turns and distortions.")
