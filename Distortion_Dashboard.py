@@ -419,7 +419,7 @@ def main() -> None:
         /* Hide Streamlit branding */
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
-        header {visibility: hidden;}
+        [data-testid="stToolbar"] {visibility: hidden;}
         .stDeployButton {display: none;}
         
         /* Your existing styles */
@@ -537,9 +537,7 @@ def main() -> None:
     st.divider()
 
 
-    # =============================
     # Heatmap tab + Inspector
-    # =============================
     if view == "Heatmap":
         st.subheader("Heatmap")
         
@@ -635,7 +633,7 @@ def main() -> None:
                 st.markdown("### LLM Explanation")
                 st.caption("Generate an AI explanation of how the detected features relate to this cognitive distortion.")
                 
-                if st.button("🤖 Generate Explanation", type="secondary", key="gen_llm_btn"):
+                if st.button("Generate Explanation", type="secondary", key="gen_llm_btn"):
                     st.session_state.show_explanation = True
                 
                 # Show explanation if button was clicked
@@ -671,9 +669,7 @@ def main() -> None:
             hide_index=True,
         )
 
-    # =============================
     # Radar tab
-    # =============================
     elif view == "Radar":
         st.subheader("Radar")   
 
